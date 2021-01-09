@@ -1,0 +1,300 @@
+" Vim with all enhancements
+source $VIMRUNTIME/vimrc_example.vim
+
+" Use the internal diff if available.
+" Otherwise use the special 'diffexpr' for Windows.
+if &diffopt !~# 'internal'
+  set diffexpr=MyDiff()
+endif
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg1 = substitute(arg1, '!', '\!', 'g')
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg2 = substitute(arg2, '!', '\!', 'g')
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let arg3 = substitute(arg3, '!', '\!', 'g')
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  let cmd = substitute(cmd, '!', '\!', 'g')
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 隐藏GVIM菜单及设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+source $VIMRUNTIME/delmenu.vim
+source $VIMRUNTIME/menu.vim
+" 窗口大小
+set lines=35 columns=140
+" 分割出来的窗口位于当前窗口下边/右边
+set splitbelow
+set splitright
+"不显示工具/菜单栏
+set guioptions-=T
+set guioptions-=m
+set guioptions-=L
+set guioptions-=r
+set guioptions-=b
+" 使用内置 tab 样式而不是 gui
+set guioptions-=e
+set nolist
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 通用设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let mapleader = "," "定义<leader>键
+set nocompatible    "设置不兼容原始vi模式
+filetype on     "设置开启文件类型侦测
+filetype plugin on  "加载对应文件类型插件
+set noeb        "关闭错误提示
+syntax enable       "开启语法高亮功能
+syntax on       "自动语法高亮
+set t_Co=256        "开启256色支持
+set cmdheight=2     "设置命令行高度
+set showcmd     "select模式下显示选中的行数
+set ruler       "总是显示光标的位置
+set laststatus=2    "总是显示状态栏
+set number      "开启行号显示
+"set cursorline      "高亮显示当前行
+set whichwrap+=<,>,h,l  "设置光标键跨行
+set virtualedit=block,onemore   "允许光标出现在最后一个字符的后面
+set guioptions=acg
+set guioptions-=e
+set scrolloff=8
+set noundofile
+
+
+
+set mousehide "hide mouse when key
+set mouse=h  "disable mouse
+autocmd GUIEnter * simalt ~x   "全屏
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 代码补全
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set wildmenu        "vim自身命令行模式智能补全
+set completeopt-=preview    "补全时不显示窗口，只显示补全列表
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"代码折叠
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set foldmethod=syntax       "设置基于语法进行代码折叠
+set nofoldenable            "关闭代码折叠
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 代码缩进与排版
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set autoindent      "设置自动缩进
+set cindent     "设置使用C/C++语言的自动缩进方式
+set cinoptions=g0,:0,N-s,(0 "设置使用C/C++语言的具体缩进方式
+set smartindent     "智能选择对齐方式
+filetype indent on  "自适应不同语言的智能缩进
+set expandtab       "将制表符扩展为空格
+set tabstop=4       "设置编辑时制表符所占的空格数
+set shiftwidth=4    "设置格式化时制表符占用的空格数
+set softtabstop=4       "设置4个空格为制表符
+set smarttab        "在行和段开始处使用制表符
+"set nowrap     "禁止折行
+set backspace=2     "使用回车键正常处理indent.eol,start等
+
+
+
+"自动补全
+imap ( ()<ESC>i
+imap () ()<ESC>a
+
+imap [ []<ESC>i
+imap [] []<ESC>a
+
+imap {<SPACE> {<SPACE><SPACE>};<ESC><LEFT><LEFT>i
+imap {; {<CR><CR>};<ESC>jddkkddkA
+imap { {}<ESC>i<CR><CR><ESC>kA<TAB><RIGHT><RIGHT>
+imap {} {}<ESC>a
+
+imap < <><ESC>i
+imap <<SPACE> <<ESC><RIGHT>r<SPACE>a
+imap << <<<ESC><RIGHT>r<SPACE>a<BACKSPACE>
+imap <= <=<ESC>a
+imap <> <><ESC>a
+
+imap "" ""<ESC>i
+imap '' ''<ESC>i
+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 缓存设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set nobackup        "设置不备份
+set noswapfile      "禁止生成临时文件
+set autoread        "文件在vim之外修改过，自动重新载入
+set autowrite       "设置自动保存
+set confirm         "在处理未保存或只读文件时，弹出确认
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 编码设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"set the menu & the message to English
+set helplang=cn
+"set langmenu=en_US
+"let $LANG = 'en_US'
+set termencoding=utf-8
+set encoding=utf8
+set fileencodings=utf8,ucs-bom,gbk,cp936,gb2312,gb18030
+source $VIMRUNTIME/delmenu.vim
+source $VIMRUNTIME/menu.vim
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 主题设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+colorscheme desert
+set guifont=Consolas:h12:cANSI:qDRAFT
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" plug设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+set rtp+=$VIM/vimfiles/bundle/Vundle.vim/
+let path='$VIM/Vimfiles/bundle'
+call vundle#begin(path)
+Plugin 'gmarik/Vundle.vim'         "管理Vundle自身 
+Plugin 'Yggdroot/LeaderF'
+Plugin 'sickill/vim-monokai'
+Plugin 'preservim/nerdtree'
+Plugin 'tpope/vim-commentary'
+Plugin 'terryma/vim-smooth-scroll'
+Plugin 'nanotech/jellybeans.vim'
+
+" 简要帮助文档
+" :PluginList       - 列出所有已配置的插件
+" :PluginInstall    - 安装插件,追加 `!` 用以更新或使用 :PluginUpdate
+" :PluginSearch foo - 搜索 foo ; 追加 `!` 清除本地缓存
+" :PluginClean      - 清除未使用插件,需要确认; 追加 `!` 自动批准移除未使用插件
+
+
+call vundle#end()            
+filetype plugin indent on
+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" plug 额外设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map <BS> gcc
+vmap <BS> gc
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 通用快捷键设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap mm <leader>m
+map <F7> :NERDTreeToggle<CR>
+let NERDTreeShowHidden=1
+nmap <silent> ,nf :NERDTreeFind<CR>
+let NERDTreeIgnore=['\.pyc','\~$','\.swp']
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" leaderf设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:Lf_PopupPalette = {
+    \  'light': {
+    \      'Lf_hl_match': {
+    \                'gui': 'NONE',
+    \                'font': 'NONE',
+    \                'guifg': 'NONE',
+    \                'guibg': '#303136',
+    \                'cterm': 'NONE',
+    \                'ctermfg': 'NONE',
+    \                'ctermbg': '236'
+    \              },
+    \      'Lf_hl_cursorline': {
+    \                'gui': 'NONE',
+    \                'font': 'NONE',
+    \                'guifg': 'NONE',
+    \                'guibg': '#303136',
+    \                'cterm': 'NONE',
+    \                'ctermfg': 'NONE',
+    \                'ctermbg': '236'
+    \              },
+    \      },
+    \  }
+
+" Show icons, icons are shown by default
+let g:Lf_ShowDevIcons = 1
+" For GUI vim, the icon font can be specify like this, for example
+"let g:Lf_DevIconsFont = "DroidSansMono Nerd Font Mono"
+" If needs
+set ambiwidth=double
+	
+
+" don't show the help in normal mode
+let g:Lf_HideHelp = 1
+let g:Lf_UseCache = 0
+let g:Lf_UseVersionControlTool = 0
+let g:Lf_IgnoreCurrentBufferName = 1
+" popup mode
+let g:Lf_WindowPosition = 'popup'
+let g:Lf_PreviewInPopup = 1
+"let g:Lf_StlSeparator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu Sans Mono for Powerline" }
+let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0 }
+
+let g:Lf_ShortcutF = "<leader>ff"
+noremap <leader>fb :<C-U><C-R>=printf("Leaderf buffer %s", "")<CR><CR>
+"noremap <leader>fm :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
+noremap <space>m :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
+noremap <leader>ft :<C-U><C-R>=printf("Leaderf bufTag %s", "")<CR><CR>
+noremap <leader>fl :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
+
+noremap <C-B> :<C-U><C-R>=printf("Leaderf! rg --current-buffer -e %s ", expand("<cword>"))<CR>
+noremap <C-H> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
+noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -w %s ", expand("<cword>"))<CR>
+noremap <S-F> :<C-U><C-R>=printf("Leaderf! rg -w ")<CR>
+
+" search visually selected text literally
+xnoremap gf :<C-U><C-R>=printf("Leaderf! rg -F -e %s ", leaderf#Rg#visual())<CR>
+noremap go :<C-U>Leaderf! rg --recall<CR>
+
+" should use `Leaderf gtags --update` first
+let g:Lf_GtagsAutoGenerate = 1
+let g:Lf_Gtagslabel = 'native-pygments'
+noremap <leader>fr :<C-U><C-R>=printf("Leaderf! gtags -r %s --auto-jump", expand("<cword>"))<CR><CR>
+"noremap <leader>fd :<C-U><C-R>=printf("Leaderf! gtags -d %s --auto-jump", expand("<cword>"))<CR><CR>
+noremap <C-]> :<C-U><C-R>=printf("Leaderf! gtags -d %s --auto-jump", expand("<cword>"))<CR><CR>
+noremap <leader>fo :<C-U><C-R>=printf("Leaderf! gtags --recall %s", "")<CR><CR>
+noremap <leader>fn :<C-U><C-R>=printf("Leaderf gtags --next %s", "")<CR><CR>
+noremap <leader>fp :<C-U><C-R>=printf("Leaderf gtags --previous %s", "")<CR><CR>
+
+
+
+
+
